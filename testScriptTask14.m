@@ -18,11 +18,11 @@ kappa = 1;
 
 
 % Toe of the glacier
-[~, xF] = getAccumulationRate(0, x0, xS, q0, a, J0, rho);
+xF = getStationaryToe(x0, xS, q0, a, J0, rho);
 
 % Accumulation rate
-q    = @(x) getAccumulationRate(x, x0, xS, q0, a, J0, rho);
-intq = @(x) getCumulativeAccumulationRate(x, x0, xS, q0, a, J0, rho);
+q    = @(x) getAccumulationRate(x, x0, xS, xF, q0, a);
+intq = @(x) getCumulativeAccumulationRate(x, x0, xS, xF, q0, a, J0, rho);
 
 % Bedrock profile
 d    = @(x) 0.1*(1-sin(2*pi*x/(xF-x0)));
