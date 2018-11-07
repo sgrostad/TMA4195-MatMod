@@ -41,7 +41,7 @@ function [x,z] = getTrajectory(x0, z0, u, v, h, dddx, dt)
         zt = z(end);
         
         x(end+1) = xt + u(x(end),z(end))*dt;
-        z(end+1) = zt + (v(x(end),z(end)) + 0*dddx(x(end-1)))*dt;
+        z(end+1) = zt + v(x(end),z(end))*dt;
         
         if (x(end-1) == x(end)) && (z(end-1) == z(end))
             break

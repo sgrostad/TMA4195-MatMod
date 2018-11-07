@@ -8,13 +8,13 @@ clc
 
 % Parameters
 x0 = 0;
-xS = 1;
+xS = 3.2;
 q0 = 0.2;
 a  = 0.8;
 m  = 1.8;
-J0 = 1;
-rho = 1;
-kappa = 1;
+J0 = 2;
+rho = 0.7;
+kappa = 1.4;
 
 
 % Toe of the glacier
@@ -23,6 +23,7 @@ xF = getStationaryToe(x0, xS, q0, a, J0, rho);
 % Accumulation rate
 q    = @(x) getAccumulationRate(x, x0, xS, xF, q0, a);
 intq = @(x) getCumulativeAccumulationRate(x, x0, xS, xF, q0, a, J0, rho);
+
 
 % Bedrock profile
 d    = @(x) 0.1*(1-sin(2*pi*x/(xF-x0)));

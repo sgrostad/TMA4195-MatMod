@@ -13,8 +13,8 @@ function [q, xF] = getAccumulationRate(x, x0, xS, xF, q0, a)
 
 end
 
-
-% function [q, xF] = getAccumulationRate(x, x0, xS, q0, a, J0, xF)
+% 
+% function [q, xF] = getAccumulationRate(x, x0, xS, q0, a, J0, rho)
 %     
 %     % x  = Discretization points
 %     % x0 = Starting point of the model of the glacier
