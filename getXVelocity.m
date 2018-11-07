@@ -1,7 +1,7 @@
 function u = getXVelocity(x, z, kappa, m, h, d)
     
     % Velocity in x direction
-    u = kappa/(m+1) * ((h(x)-d(x)).^(m+1) - (h(x)-z).^(m+1));
+    u = kappa/(m+1) * ((h(x)-d(x)).^(m+1) - abs(h(x)-z).^(m+1));
     
 end
 

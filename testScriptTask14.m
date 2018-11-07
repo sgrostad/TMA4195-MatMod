@@ -8,11 +8,11 @@ clc
 
 % Parameters
 x0 = 0;
-xS = 3.2;
-q0 = 0.2;
+xS = 1.2;
+q0 = 0.5;
 a  = 0.8;
-m  = 1.8;
-J0 = 2;
+m  = 3;
+J0 = 1;
 rho = 0.7;
 kappa = 1.4;
 
@@ -26,8 +26,8 @@ intq = @(x) getCumulativeAccumulationRate(x, x0, xS, xF, q0, a, J0, rho);
 
 
 % Bedrock profile
-d    = @(x) 0.1*(1-sin(2*pi*x/(xF-x0)));
-dddx = @(x) 0.1*2*pi/(xF-x0) * cos(2*pi*x/(xF-x0));
+d    = @(x) 0.02*(1+sin(pi*x/xS + 0));
+dddx = @(x) 0.02*pi/xS * cos(pi*x/xS + 0);
 
 % Glacier height profile
 h    = @(x) getStationaryHeightProfile(x, intq, d, m, kappa, J0, rho);
@@ -39,20 +39,20 @@ Nx = 1001;
 x = linspace(x0,xF+0.1*(xF-x0), Nx);
 
 figure
-plot(x,h(x), 'k')
+plot(x, h(x), 'k', 'linewidth', 1)
 hold on
-plot(x,d(x), 'k')
+plot(x, d(x), 'k', 'linewidth', 1)
 axis equal
 
 
 % 
 dt = 0.1;
-dj = 0.1;
+dj = 0.05;
 u = @(x,z) getXVelocity(x, z, kappa, m, h, d);
 v = @(x,z) getZVelocity(x, z, kappa, m, h, d, dhdx, dddx);
 
 
-c = getStationaryTrajectories(u, v, h, d, dddx, x0, m, kappa, rho, dt, dj);
+c = getStationaryTrajectories(u, v, h, d, dddx, x0, m, kappa, rho, dt, dj, J0);
 
 for i = 1:length(c)
     x = c{i};
