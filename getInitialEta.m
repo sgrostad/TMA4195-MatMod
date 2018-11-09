@@ -1,4 +1,4 @@
-function [etaInit, xF] = getInitialEta(x0, xS, q0, a, J0, rho, m, kappa)
+function [etaInit, xF, d] = getInitialEta(x0, xS, q0, a, J0, rho, m, kappa)
     xF = getStationaryToe(x0, xS, q0, a, J0, rho);
 
     % Accumulation rate

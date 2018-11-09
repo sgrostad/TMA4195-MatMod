@@ -10,7 +10,7 @@ m  = 1.8;
 J0 = 1;
 rho = 1;
 kappa = 1;
-[etaInit, xF] = getInitialEta(x0, xS, q0, a, J0, rho, m, kappa);
+[etaInit, xF, d] = getInitialEta(x0, xS, q0, a, J0, rho, m, kappa);
 L = floor(xF * 1.5);
 % 
 dx = 1e-2;
@@ -21,11 +21,12 @@ dt = 1e-4;
 
 f = @(eta) kappa/(m+2) * eta.^(m+2);
 
-eta = zeros(length(intX), timeMax/dt+1);
+eta = zeros(length(intX), floor(timeMax/dt+1));
 eta(:,1) = etaInit(intX);
 
-q0 = 0;
-xS = 0;
+% q0 = 0;
+% xS = 0;
+q0 = q0*2;
 q    = @(x,xF) getAccumulationRate(x, x0, xS, xF, q0, a);
 for n = 1:timeMax/dt
     qHat = q(intX,xF);
@@ -36,8 +37,10 @@ for n = 1:timeMax/dt
 end
 
 figure
+plot(3*intX,d(intX))
+axis equal
+hold on
 for n = 1:400:length(eta)
-    plot(intX,eta(:,n))
-    hold on
+    plot(3*intX,eta(:,n)+d(intX))
     pause(0.3)
 end
