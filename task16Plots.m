@@ -10,7 +10,7 @@ timeMax = 2;
 N = timeMax/dt+1;
 q0 = 0;
 xS = 0;
-L = floor(xF * 1.5);
+L = max(floor(xF * 1.5),1);
 xVol = (dx/2:dx:L-dx/2)';
 xDiff = (0:dx:L)';
 
@@ -43,14 +43,20 @@ x = (dx/2:dx:L-dx/2)';
 seasonNum = 5;
 seasons = {'melting','Sindre history','melting','snowing','melting'};
 eta = zeros(seasonNum,length(x), floor(timeMax/dt+1));
+qSeason = zeros(length(x),seasonNum);
 for i = 1:seasonNum
     [x0, xS, q0, a, m, J0, rho, kappa] = getParam(seasons{i});
-    [q, ~] = getAccumulationRate(x, x0, xS, xF, q0, a);
+    [qSeason(:,i), ~] = getAccumulationRate(x, x0, xS, xF, q0, a);
     eta(i,:,:) = finiteVolume(etaInit, x, dx, L, dt, timeMax, xF ,x0, xS, q0, a, J0, m, kappa);
-    xF = 
+    xF = (find(eta(i,:,end)<=1e-15,1) - 1)/length(x)*L;
+    if size(xF,2) ~= 1 % No zero elements in eta
+        warning('Eta array is full')
+        xF = L;
+    end
     etaInit = eta(i,:,end);
 end
-createGif = true;
+
+createGif = false;
 h = figure;
 xlim([0 x(end)]);
 axis equal
@@ -68,7 +74,9 @@ for i = 1:seasonNum
         p1 = plot(x,eta(i,:,n)'+d(x),'r');
         hold on
         plot(x,d(x),'g')
+        plot(x,qSeason(:,i),'b');
         axis equal
+        drawnow
         if createGif
             gif
         end

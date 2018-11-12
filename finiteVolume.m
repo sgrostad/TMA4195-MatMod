@@ -12,6 +12,11 @@ function eta = finiteVolume(etaInit, intX, dx, L, dt, timeMax, xF ,x0, xS, q0, a
         eta(:,n+1) = eta(:,n) - dt/dx * (f(eta(1:end,n)) - [J0; f(eta(1:end-1,n))]) ...
            + dt*qHat;
         eta(eta(:,n+1)<0,n+1) = 0;
-        xF = (find(eta(:,n+1)<=1e-15,1) - 1)/length(intX)*L;
+        eta(isnan(eta(:,n+1)),n+1) = 0;
+        xF = (find(eta(:,n+1)<=1e-15,1) - 1)/length(intX)*L; 
+        if size(xF,2) ~= 1 % No zero elements in eta
+            warning('Eta array is full')
+            xF = L;
+        end
     end
 end
