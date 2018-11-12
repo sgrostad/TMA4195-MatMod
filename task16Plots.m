@@ -45,12 +45,23 @@ seasons = {'melting','Sindre history','melting','snowing','melting'};
 eta = zeros(seasonNum,length(x), floor(timeMax/dt+1));
 for i = 1:seasonNum
     [x0, xS, q0, a, m, J0, rho, kappa] = getParam(seasons{i});
+    [q, ~] = getAccumulationRate(x, x0, xS, xF, q0, a);
     eta(i,:,:) = finiteVolume(etaInit, x, dx, L, dt, timeMax, xF ,x0, xS, q0, a, J0, m, kappa);
+    xF = 
     etaInit = eta(i,:,end);
 end
-
-figure
-
+createGif = true;
+h = figure;
+xlim([0 x(end)]);
+axis equal
+if createGif
+    filename = 'testAnimated.gif';
+    plot(x,eta(1,:,1)'+d(x),'r');
+    hold on
+    plot(x,d(x),'g')
+    axis equal
+    gif(filename,'DelayTime',0.05,'LoopCount',5,'frame',gcf);
+end
 for i = 1:seasonNum
     for n = 1:400:size(eta,3)
         hold off
@@ -58,6 +69,8 @@ for i = 1:seasonNum
         hold on
         plot(x,d(x),'g')
         axis equal
-        pause(0.05)
+        if createGif
+            gif
+        end
     end
 end
