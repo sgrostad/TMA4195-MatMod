@@ -7,14 +7,7 @@ clc
 %% Accumulation Rate
 
 % Parameters
-x0 = 0;
-xS = 1.2;
-q0 = 0.5;
-a  = 0.8;
-m  = 3;
-J0 = 1;
-rho = 0.7;
-kappa = 1.4;
+[x0, xS, q0, a, m, J0, rho, kappa] = getParam('Engabreen annual');
 
 
 % Toe of the glacier
@@ -26,8 +19,8 @@ intq = @(x) getCumulativeAccumulationRate(x, x0, xS, xF, q0, a, J0, rho);
 
 
 % Bedrock profile
-d    = @(x) 0.02*(1+sin(pi*x/xS + 0));
-dddx = @(x) 0.02*pi/xS * cos(pi*x/xS + 0);
+d    = @(x) 0.0*(1+sin(pi*x/xS + 0));
+dddx = @(x) 0.0*pi/xS * cos(pi*x/xS + 0);
 
 % Glacier height profile
 h    = @(x) getStationaryHeightProfile(x, intq, d, m, kappa, J0, rho);
@@ -45,16 +38,22 @@ plot(x, d(x), 'k', 'linewidth', 1)
 axis equal
 
 
-% 
+
 dt = 0.1;
-dj = 0.05;
+dj = J0/20;
 u = @(x,z) getXVelocity(x, z, kappa, m, h, d);
 v = @(x,z) getZVelocity(x, z, kappa, m, h, d, dhdx, dddx);
 
 
-c = getStationaryTrajectories(u, v, h, d, dddx, x0, m, kappa, rho, dt, dj, J0);
+
+maxxqpos = getMaxXWithPositiveAccumulation(xS, q0, a);
+[c, t] = getStationaryTrajectories(u, v, h, d, dddx, intq, x0, m, kappa, rho, dt, dj, J0, maxxqpos);
+
 
 for i = 1:length(c)
-    x = c{i};
-    plot(x(1,:), x(2,:), 'k');
+    xz = c{i}(:,1:5:end);
+    %plot(xz(1,:), xz(2,:), 'k');
+    %quiver(xz(1,:), xz(2,:), u(xz(1,:), xz(2,:)), v(xz(1,:), xz(2,:)), 0.2, 'k', 'markersize', 200);
 end
+
+
