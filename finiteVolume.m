@@ -1,46 +1,17 @@
-clear all
-close all
-clc
-% Parameters
-x0 = 0;
-xS = 1;
-q0 = 1;
-a  = 0.8;
-m  = 1.8;
-J0 = 1;
-rho = 1;
-kappa = 1;
-[etaInit, xF, d] = getInitialEta(x0, xS, q0, a, J0, rho, m, kappa);
-L = floor(xF * 1.5);
-% 
-dx = 1e-2;
-% x = (0:dx:L)';
-intX = (dx/2:dx:L-dx/2)';
-timeMax = 2;
-dt = 1e-4;
-
-f = @(eta) kappa/(m+2) * eta.^(m+2);
-
-eta = zeros(length(intX), floor(timeMax/dt+1));
-eta(:,1) = etaInit(intX);
-
-% q0 = 0;
-% xS = 0;
-q0 = q0*2;
-q    = @(x,xF) getAccumulationRate(x, x0, xS, xF, q0, a);
-for n = 1:timeMax/dt
-    qHat = q(intX,xF);
-    eta(:,n+1) = eta(:,n) - dt/dx * (f(eta(1:end,n)) - [J0; f(eta(1:end-1,n))]) ...
-       + dt*qHat;
-    eta(eta(:,n+1)<0,n+1) = 0;
-    xF = (find(eta(:,n+1)<=1e-15,1) - 1)/length(intX)*L;
-end
-
-figure
-plot(3*intX,d(intX))
-axis equal
-hold on
-for n = 1:400:length(eta)
-    plot(3*intX,eta(:,n)+d(intX))
-    pause(0.3)
+function eta = finiteVolume(etaInit, intX, dx, L, dt, timeMax, xF ,x0, xS, q0, a, J0, m, kappa)
+    f = @(eta) kappa/(m+2) * eta.^(m+2);
+    eta = zeros(length(intX), floor(timeMax/dt+1));
+    if length(etaInit) == 1 %etaInit is a function handle
+        eta(:,1) = etaInit(intX);
+    else
+        eta(:,1) = etaInit;
+    end
+    q    = @(x,xF) getAccumulationRate(x, x0, xS, xF, q0, a);
+    for n = 1:timeMax/dt
+        qHat = q(intX,xF);
+        eta(:,n+1) = eta(:,n) - dt/dx * (f(eta(1:end,n)) - [J0; f(eta(1:end-1,n))]) ...
+           + dt*qHat;
+        eta(eta(:,n+1)<0,n+1) = 0;
+        xF = (find(eta(:,n+1)<=1e-15,1) - 1)/length(intX)*L;
+    end
 end
