@@ -4,7 +4,7 @@ etaMat = zeros(M,N+1);
 etaMat(:,1) = eta0;
 
 %Parameters in q changed permanently:
-%xS = xS0-0.2;
+xS = xS0;
 %xS=x0;
 %q0=0;
 
@@ -22,12 +22,12 @@ for n = 1:N
     
     %Changing q during the iteration:
     %a_n = min(a+10*dt*n,1);
-    q0_n = max(q0-dt*n, 0);
-    xS_n = max(xS0-dt*n, x0);
-    q= (getAccumulationRate(x, x0,xS_n, xF,q0_n, a))';
+    %q0_n = max(q0-dt*n, 0);
+    %xS_n = max(xS0-dt*n, x0);
+    %q= (getAccumulationRate(x, x0,xS_n, xF,q0_n, a))';
     
     %q constant through the iteration (except xF)
-    %q= (getAccumulationRate(x, x0,xS, xF, q0, a))';
+    q= (getAccumulationRate(x, x0,xS, xF, q0, a))';
     
     %Forcing first elem. to zero because of BCs
     q(1)=0;

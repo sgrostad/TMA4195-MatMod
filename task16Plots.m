@@ -2,32 +2,31 @@ clear all
 close all
 clc
 %% plot Volume and Differences together
-[x0, xS, q0, a, m, J0, rho, kappa] = getParam('Sindre history');
+[x0, xS, q0, a, m, J0, rho, kappa] = getParam('Engabreen winter');
 [etaInit, xF, d] = getInitialEta(x0, xS, q0, a, J0, rho, m, kappa);
 dx = 1e-2;
 dt = 1e-4;
 timeMax = 2;
 N = timeMax/dt+1;
-q0 = 0;
-xS = 0;
+[x0, xS, q0, a, m, J0, rho, kappa] = getParam('Engabreen annual');
 L = max(floor(xF * 1.5),1);
 xVol = (dx/2:dx:L-dx/2)';
 xDiff = (0:dx:L)';
 
-etaVol = finiteVolume(etaInit, xVol, dx, L, dt, timeMax, xF ,x0, xS, q0, a, J0, m, kappa);
+etaVol = finiteVolume(etaInit, xVol, dx, L, dt, timeMax, xF ,x0, xS, q0, a, J0, m, kappa, rho);
 etaDiff = differencesNum(N, etaInit(xDiff), m, dx, xDiff', dt, kappa, x0, xS, q0, a);
 
 
 figure
 for n = 1:400:length(etaVol)
     hold off
-    p1 = plot(xVol,etaVol(:,n)+d(xVol),'r');
+    p1 = plot(3*xVol,etaVol(:,n)+d(xVol),'r');
     set(p1,'LineWidth',2)
     hold on
     axis equal
-    p2 = plot(xDiff,etaDiff(:,n)+d(xDiff),'b');
+    p2 = plot(3*xDiff,etaDiff(:,n)+d(xDiff),'b');
     set(p2,'LineWidth',1)
-    plot(xVol,d(xVol),'g')
+    plot(3*xVol,d(xVol),'g')
     legend('Finite Volume','Finite Differences', 'Bedrock')
     pause(0.3)
 end

@@ -21,8 +21,8 @@ function [x0, xS, q0, a, m, J0, rho, kappa] = getParam(type)
             
             year = 3600*24*365;
             Q = 2*epsilon*mu*H*Theta^m/kappa;
-            T = H/Q/year
-            U = L/T
+            T = H/Q/year;
+            U = L/T;
            
         case 'Engabreen winter'
             m  = 3.0;
