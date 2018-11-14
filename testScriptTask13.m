@@ -1,20 +1,15 @@
 % Parameters
-x0 = 0;
-xS = 1;
-q0 = 0.2;
-a  = 0.8;
-m  = 1.8;
-J0 = 11;
-rho = 1;
-kappa = 1;
-x_initvec = 0.01:0.5:6;
+[x0, xS, q0, a, m, J0, rho, kappa] = getParam('Engabreen annual');
+xF = getStationaryToe(x0, xS, q0, a, J0, rho);
+
+x_initvec = 0.01:0.1:1;
 tend = 1;
 d = @(x) 0*x;
 dddx = @(x) 0;
 
-q    = @(x) getAccumulationRate(x, x0, xS, q0, a, J0, rho);
-intq = @(x) getCumulativeAccumulationRate(x, x0, xS, q0, a, J0, rho);
-eta = @(x) getStationaryHeightProfile(x, q, intq, d, 0, m, kappa, J0, rho);
+q    = @(x) getAccumulationRate(x, x0, xS, xF, q0, a);
+intq = @(x) getCumulativeAccumulationRate(x, x0, xS, xF, q0, a, J0, rho);
+eta = @(x) getStationaryHeightProfile(x, intq, d, m, kappa, J0, rho);
 detadx = @(x) getStationaryHeightProfileDerivative(x, q, intq, d, dddx, m, kappa, J0, rho)- dddx(x);
 
 %% charTest
@@ -34,8 +29,8 @@ end
 
 %% zTest
 hold off
-x_initvec = 0:0.1:6;
-k0 = @(x) x^2*exp(-2*(x-0.5)^2)*sin(x-1);
+x_initvec = 0:0.01:0.95;
+k0 = @(x) 300*x*(x-0.2)*exp(-500*(x-0.1)^2)*sin(20*(x-0.1));
 kb = @(t) 0;
 
 h = figure;
@@ -58,7 +53,7 @@ for x_init = x_initvec
     i = i+1;
 end
 plot(x_vec,z_vec)
-axis([0,7,-1,1])
+axis([0,1.2,-3,3])
 drawnow
 
 frame = getframe(h); 
