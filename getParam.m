@@ -100,6 +100,7 @@ function [x0, xS, q0, a, m, J0, rho, kappa] = getParam(type)
             rho = 1;
             kappa = 1;
         otherwise
+            warning('Using otherwise in parameters')
             [x0, xS, q0, a, m, J0, rho, kappa] = getParam('melting');
     end
 end
