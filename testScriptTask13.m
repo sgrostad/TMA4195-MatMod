@@ -27,7 +27,7 @@ plot(charac(:,2),charac(:,1))
 
 end
 
-%% zTest
+%% zTestWithGIF
 hold off
 x_initvec = 0:0.01:0.95;
 k0 = @(x) 300*x*(x-0.2)*exp(-500*(x-0.1)^2)*sin(20*(x-0.1));
@@ -66,7 +66,36 @@ else
   imwrite(imind,cm,filename,'gif','WriteMode','append','DelayTime',0.1); 
 end 
 end
-    
+
+%% zTestWithPlot
+close all
+x_initvec = 0:0.01:0.95;
+k0 = @(x) 300*x*(x-0.2)*exp(-500*(x-0.1)^2)*sin(20*(x-0.1));
+kb = @(t) 0;
+for tend = [0.01,0.2,0.4,0.6]
+z_vec = [];
+x_vec = [];
+i=1;
+for tstart = tend-0.01:-0.01:0.01
+    vals = calcFunctionValueAlongChar(0, [tstart,tend], eta, detadx, m, kappa, k0, kb);
+    x_vec(i) = vals(end,1);
+    z_vec(i) = vals(end,2);
+    i = i+1;
+end
+
+for x_init = x_initvec
+    vals = calcFunctionValueAlongChar(x_init, [0,tend], eta, detadx, m, kappa, k0, kb);
+    x_vec(i) = vals(end,1);
+    z_vec(i) = vals(end,2);
+    i = i+1;
+end
+plot(x_vec,z_vec)
+axis([0,1.2,-3,3])
+
+hold on
+end
+legend('t=0','t=0.2','t=0.4','t=0.6')
+
 %% bTest (perhaps irrelevant)
 hold off
 k0 = @(x) 0;
