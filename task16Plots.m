@@ -18,18 +18,41 @@ etaDiff = differencesNum(N, etaInit(xDiff), m, dx, xDiff', dt, kappa, x0, xS, q0
 
 
 figure
-for n = 1:400:length(etaVol)
+createGif = false;
+xScale = 3;
+if createGif
+    filename = 'testAnimated.gif';
     hold off
-    p1 = plot(3*xVol,etaVol(:,n)+d(xVol),'r');
+    p1 = plot(xScale*xVol,etaVol(:,n)+d(xVol),'r');
     set(p1,'LineWidth',2)
     hold on
-    p2 = plot(3*xDiff,etaDiff(:,n)+d(xDiff),'b');
+    p2 = plot(xScale*xDiff,etaDiff(:,n)+d(xDiff),'b');
     set(p2,'LineWidth',1)
-    plot(3*xVol,d(xVol),'g')
+    plot(xScale*xVol,d(xVol),'g')
     axis equal
+    set(gca,'XTick',[], 'YTick', [])
     set(gca,'FontSize',16)
     legend('Finite Volume','Finite Differences', 'Bedrock')
-    pause(0.3)
+    gif(filename,'DelayTime',0.1,'LoopCount',5,'frame',gcf);
+end
+
+for n = 1:400:length(etaVol)
+    hold off
+    p1 = plot(xScale*xVol,etaVol(:,n)+d(xVol),'r');
+    set(p1,'LineWidth',2)
+    hold on
+    p2 = plot(xScale*xDiff,etaDiff(:,n)+d(xDiff),'b');
+    set(p2,'LineWidth',1)
+    plot(xScale*xVol,d(xVol),'g')
+    axis equal
+    set(gca,'XTick',[], 'YTick', [])
+    set(gca,'FontSize',16)
+    legend('Finite Volume','Finite Differences', 'Bedrock')
+    if createGif
+        gif
+    else
+        pause(0.1)
+    end
 end
 
 %% Plot varying production
@@ -56,7 +79,7 @@ for i = 1:seasonNum
     etaInit = eta(i,:,end);
 end
 
-createGif = true;
+createGif = false;
 xScale = 3;
 h = figure;
 if createGif
@@ -95,6 +118,8 @@ for i = 1:seasonNum
         drawnow
         if createGif
             gif
+        else
+            pause(0.1)
         end
     end
 end
