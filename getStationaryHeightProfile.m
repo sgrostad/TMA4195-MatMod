@@ -18,7 +18,7 @@
 
 
 
-function h = getStationaryHeightProfile(x, q, intq, d, dddx, m, kappa, J0, rho)
+function h = getStationaryHeightProfile(x, intq, d, m, kappa, J0, rho)
     % N  = Number of discretization points
     % x0 = Starting point of the model of the glacier
     % xS = Starting point snow smelts in summer

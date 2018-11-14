@@ -11,3 +11,4 @@
 cmake-build-debug/**
 # OSX / *nix default autosave extension MATLAB
 *.m~
+*.idraw
