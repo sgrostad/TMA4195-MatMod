@@ -43,7 +43,7 @@ v = @(x,z) getZVelocity(x, z, kappa, m, h, d, dhdx, dddx);
 maxxqpos = getMaxXWithPositiveAccumulation(xS, q0, a);
 
 % Compute trajectories and the times the trajectories takes
-[c, tvec] = getStationaryTrajectories(u, v, h, d, dddx, intq, x0, m, kappa, rho, dt, dj, J0, maxxqpos);
+[c, tvec] = getStationaryTrajectories(u, v, h, d, intq, x0, m, kappa, rho, dt, dj, J0, maxxqpos);
 
 
 
