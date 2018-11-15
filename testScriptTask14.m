@@ -43,10 +43,6 @@ maxxqpos = getMaxXWithPositiveAccumulation(xS, q0, a);
 
 % Compute trajectories and the times the trajectories takes
 [c, tvec] = getStationaryTrajectories(u, v, h, d, intq, x0, m, kappa, rho, dt, dj, J0, maxxqpos);
-<<<<<<< HEAD
-
-=======
->>>>>>> 08ace811f0101b3207eeb16bf993aedfa067b8ae
 
 for i = 1:length(c)
     xz = c{i};
