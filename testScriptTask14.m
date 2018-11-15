@@ -31,7 +31,6 @@ x = linspace(x0,xF+0.1*(xF-x0), Nx);
 plot(x, h(x), 'k', 'linewidth', 1)
 hold on
 plot(x, d(x), 'k', 'linewidth', 1)
-hold off
 axis equal
 
 dt = 0.01;
@@ -43,8 +42,14 @@ v = @(x,z) getZVelocity(x, z, kappa, m, h, d, dhdx, dddx);
 maxxqpos = getMaxXWithPositiveAccumulation(xS, q0, a);
 
 % Compute trajectories and the times the trajectories takes
-[c, tvec] = getStationaryTrajectories(u, v, h, d, dddx, intq, x0, m, kappa, rho, dt, dj, J0, maxxqpos);
+[c, tvec] = getStationaryTrajectories(u, v, h, d, intq, x0, m, kappa, rho, dt, dj, J0, maxxqpos);
 
+
+for i = 1:length(c)
+    xz = c{i};
+    plot(xz(1,:), xz(2,:), 'k')
+end
+hold off
 
 
 
