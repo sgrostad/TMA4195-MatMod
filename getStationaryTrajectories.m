@@ -1,12 +1,16 @@
-function [trajectories, times] = getStationaryTrajectories(u, v, h, d, dddx, intq, x0, m, kappa, rho, dt, dj, J0, maxxqpos)
+function [trajectories, times] = getStationaryTrajectories(u, v, h, d, intq, x0, m, kappa, rho, dt, dj, J0, maxxqpos)
+    % Computes trajectories for a stationary glacier
+
+
+    % Construct initial values with uniform flux
+    niter = 100;
+    [z0vec, x0vec] = equiFlux2(h, d, intq, x0, m, kappa, rho, dj, J0, maxxqpos, niter);
     
-    % Construct uniformy spaced initial values
-    niter = 10;
-    [z0vec, x0vec] = equiFlux(h, d, intq, x0, m, kappa, rho, dj, J0, maxxqpos, niter);
+    % Compute trajectories
     trajectories = cell(1, length(z0vec));
     times = zeros(1, length(z0vec));
     for i = 1:length(z0vec)
-        [x, z, t] = getTrajectory(x0vec(i), z0vec(i), u, v, h, dddx, dt);
+        [x, z, t] = getTrajectory(x0vec(i), z0vec(i), u, v, h, dt);
         trajectories{i} = [x; z];
         times(i) = t;
         plot(x, z, 'k');
@@ -16,59 +20,58 @@ end
 
 
 
-function [z, x] = equiFlux(h, d, intq, x0, m, kappa, rho, dj, J0, maxxqpos, niter) %(z0vec, u, x0, rho, j0vec, niter)
+
+function [z, x] = equiFlux2(h, d, intq, x0, m, kappa, rho, dj, J0, maxxqpos, niter) %(z0vec, u, x0, rho, j0vec, niter)
     
     % Estimate the z-values for x = x0 that gives constant flux between
-    % the x's by fixed point iteration.
-    
-    j0vec = 0:dj:J0;
-    if j0vec(end) ~= J0
-        j0vec(end+1) = J0;
+    % the z's by binary search.
+    x = [];
+    z = [];
+    for j = dj:dj:J0
+        za = d(x0);
+        zb = h(x0);
+        for i = 1:niter
+            zi = (za+zb)/2;
+            jz = rho*kappa/(m+1) * ((h(0) - d(0)).^(m+1) .* (zi-d(0)) + 1/(m+2) * ((h(0) - zi).^(m+2) - (h(0) - d(0)).^(m+2)));
+            if jz < j
+                za = zi;
+            else
+                zb = zi;
+            end
+        end
+        x = [x,x0];
+        z = [z,za];
     end
     
-    zz = j0vec/J0 * (h(0) - d(0)) + d(0);
-    j = zeros(size(zz));
-    
-    for i = 1:niter
-        j(2:end) = rho*kappa/(m+1) * ((h(0) - d(0)).^(m+1) .* (zz(2:end)-d(0)) + 1/(m+1) * ((h(0) - zz(2:end)).^(m+2) - (h(0) - d(0)).^(m+2)));
-        j(end) = j0vec(end);
-        zz = interp1(j, zz, j0vec);
+    % Estimate the x-values for z = h(x) that gives constant flux between
+    % the (x's, z's) by binary search.
+    while true
+        j = j+dj;
+        xa = x(end);
+        xb = maxxqpos;
+        jxa = rho*intq(xa)+J0;
+        jxb = rho*intq(xb)+J0;
+        if jxb-jxa < dj
+            break
+        end
+        for i = 1:niter
+            xi = (xa+xb)/2;
+            jx = rho*intq(xi)+J0;
+            if jx < j
+                xa = xi;
+            else
+                xb = xi;
+            end
+        end
+        x = [x,xa];
+        z = [z,h(xa)];
     end
-    
-    z = zz(2:end-1);
-    x = x0 + zeros(size(z));
-    
-    % Estimate the x's for z = h giving constant flux between the points.
-    
-    qtot = intq(maxxqpos);
-    j0vec = (j0vec(end-1)+dj-J0):dj:(rho*qtot);
-    if isempty(j0vec)
-        return
-    end
-    if j0vec(end) ~= rho*qtot
-        j0vec(end+1) = rho*qtot;
-    end
-    if j0vec(1) > 0
-        j0vec = [0, j0vec];
-    end
-    
-    xx = x0 + j0vec/(rho*qtot) * (maxxqpos - x0);
-    j = j0vec(1) + zeros(size(xx));
-    
-    for i = 1:niter
-        j(2:end) = j(1) + rho*intq(xx(2:end));
-        j(end) = j0vec(end);
-        xx = interp1(j, xx, j0vec);
-    end
-    
-    z = [z, h(xx(2:end-1))];
-    x = [x, xx(2:end-1)];
     
 end
 
 
 
-function [x, z, t] = getTrajectory(x0, z0, u, v, h, dddx, dt)
+function [x, z, t] = getTrajectory(x0, z0, u, v, h, dt)
     % Solves the pde given by
     %   x' = u(x,z)
     %   z' = v(x,z)
@@ -76,6 +79,7 @@ function [x, z, t] = getTrajectory(x0, z0, u, v, h, dddx, dt)
     %   x(0) = x0
     %   z(0) = z0
     % until z > h
+    % using forward Euler.
     
     x = x0;
     z = z0;
