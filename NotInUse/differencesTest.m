@@ -39,13 +39,11 @@ dhdx = @(x) getStationaryHeightProfileDerivative(x, q, intq, d, dddx, m, kappa, 
 M = 500;
 x = linspace(x0,1, M);
 dx = x(2)-x(1);
-dx
 
 %Discretization in time
 N = 2000;
 tend = 2;
 dt = tend/N;
-dt
 %initial values: 
 eta0 = (h(x)-d(x))';
 

@@ -1,2 +1,6 @@
 # TMA4195-MatMod
-hei p? deg
+To test the numerical methods, run the scripts:
+
+* testScriptTask13
+* testScriptTask14
+* task16Plots.m
