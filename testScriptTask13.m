@@ -34,7 +34,7 @@ k0 = @(x) 300*x*(x-0.2)*exp(-500*(x-0.1)^2)*sin(20*(x-0.1));
 kb = @(t) 0;
 
 h = figure;
-filename = 'GIFtest.gif';
+filename = 'perturbations.gif';
 for tend = 0.01:0.01:0.6
 z_vec = [];
 x_vec = [];

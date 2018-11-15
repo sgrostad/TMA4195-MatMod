@@ -18,18 +18,41 @@ etaDiff = differencesNum(N, etaInit(xDiff), m, dx, xDiff', dt, kappa, x0, xS, q0
 
 
 figure
-for n = 1:400:length(etaVol)
+createGif = false;
+xScale = 3;
+if createGif
+    filename = 'testAnimated.gif';
     hold off
-    p1 = plot(3*xVol,etaVol(:,n)+d(xVol),'r');
+    p1 = plot(xScale*xVol,etaVol(:,n)+d(xVol),'r');
     set(p1,'LineWidth',2)
     hold on
-    p2 = plot(3*xDiff,etaDiff(:,n)+d(xDiff),'b');
+    p2 = plot(xScale*xDiff,etaDiff(:,n)+d(xDiff),'b');
     set(p2,'LineWidth',1)
-    plot(3*xVol,d(xVol),'g')
+    plot(xScale*xVol,d(xVol),'g')
     axis equal
+    set(gca,'XTick',[], 'YTick', [])
     set(gca,'FontSize',16)
     legend('Finite Volume','Finite Differences', 'Bedrock')
-    pause(0.3)
+    gif(filename,'DelayTime',0.1,'LoopCount',5,'frame',gcf);
+end
+
+for n = 1:400:length(etaVol)
+    hold off
+    p1 = plot(xScale*xVol,etaVol(:,n)+d(xVol),'r');
+    set(p1,'LineWidth',2)
+    hold on
+    p2 = plot(xScale*xDiff,etaDiff(:,n)+d(xDiff),'b');
+    set(p2,'LineWidth',1)
+    plot(xScale*xVol,d(xVol),'g')
+    axis equal
+    set(gca,'XTick',[], 'YTick', [])
+    set(gca,'FontSize',16)
+    legend('Finite Volume','Finite Differences', 'Bedrock')
+    if createGif
+        gif
+    else
+        pause(0.1)
+    end
 end
 
 %% Plot varying production
@@ -37,16 +60,16 @@ end
 [etaInit, xF, d] = getInitialEta(x0, xS, q0, a, J0, rho, m, kappa);
 dx = 1e-2;
 dt = 1e-4;
-timeMax = 2;
+timeMax = 3;
 L = floor(xF * 1.5);
 x = (dx/2:dx:L-dx/2)';
-seasonNum = 5;
-seasons = {'Engabreen winter','Engabreen summer','Engabreen winter','Engabreen annual','Engabreen summer'};
+seasonNum = 3;
+seasons = {'Engabreen summer','Engabreen annual','Engabreen winter'};
 eta = zeros(seasonNum,length(x), floor(timeMax/dt+1));
 qSeason = zeros(length(x),seasonNum);
 for i = 1:seasonNum
     [x0, xS, q0, a, m, J0, rho, kappa] = getParam(seasons{i});
-    [qSeason(:,i), ~] = getAccumulationRate(x, x0, xS, xF, q0, a);
+    [qSeason(:,i), ~] = getAccumulationRate(x, x0, xS, L, q0, a);
     eta(i,:,:) = finiteVolume(etaInit, x, dx, L, dt, timeMax, xF ,x0, xS, q0, a, J0, m, kappa, rho);
     xF = (find(eta(i,:,end)<=1e-15,1) - 1)/length(x)*L;
     if size(xF,2) ~= 1 % No zero elements in eta
@@ -64,17 +87,17 @@ if createGif
     plot(xScale*x,eta(1,:,1)'+d(x),'r');
     hold on
     plot(xScale*x,d(x),'g')
-    plot(xScale*x,qSeason(:,1)/2-1,'b');
+    plot(xScale*x,qSeason(:,3)/2-1);
     plot(xScale*x,-ones(length(x)),'b--');
     
     xlim([0 xScale*x(end)]);
     ylim([-2.5,2.5]);
-    legend('Glacier','Bedrock','q','q = 0')
-    seasonTitle = sprintf('q = %s',seasons{1});
+    legend('Glacier','Bedrock','q_{season}','q = 0')
+    seasonTitle = sprintf('q = %s',seasons{3});
     title(seasonTitle)
     set(gca,'XTick',[], 'YTick', [])
     set(gca,'FontSize',16)
-    gif(filename,'DelayTime',0.08,'LoopCount',5,'frame',gcf);
+    gif(filename,'DelayTime',0.1,'LoopCount',5,'frame',gcf);
 end
 for i = 1:seasonNum
     for n = 1:400:size(eta,3)
@@ -87,7 +110,7 @@ for i = 1:seasonNum
         
         xlim([0 xScale*x(end)]);
         ylim([-2.5,2.5]);
-        legend('Glacier','Bedrock','q','q = 0')
+        legend('Glacier','Bedrock','q_{season}','q = 0')
         seasonTitle = sprintf('q = %s',seasons{i});
         title(seasonTitle)
         set(gca,'XTick',[], 'YTick', [])
@@ -95,6 +118,8 @@ for i = 1:seasonNum
         drawnow
         if createGif
             gif
+        else
+            pause(0.1)
         end
     end
 end

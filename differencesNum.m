@@ -1,13 +1,7 @@
-function etaMat = differencesNum(N,eta0,m,dx,x,dt,kappa,x0,xS0,q0,a)
+function etaMat = differencesNum(N,eta0,m,dx,x,dt,kappa,x0,xS,q0,a)
 M = length(eta0);
 etaMat = zeros(M,N+1);
 etaMat(:,1) = eta0;
-
-%Parameters in q changed permanently:
-xS = xS0;
-%xS=x0;
-%q0=0;
-
 
 etaLast = eta0;
 for n = 1:N
@@ -18,15 +12,6 @@ for n = 1:N
     end
     xF = x(whichxF);
     
-    %Update q for all positions in time n
-    
-    %Changing q during the iteration:
-    %a_n = min(a+10*dt*n,1);
-    %q0_n = max(q0-dt*n, 0);
-    %xS_n = max(xS0-dt*n, x0);
-    %q= (getAccumulationRate(x, x0,xS_n, xF,q0_n, a))';
-    
-    %q constant through the iteration (except xF)
     q= (getAccumulationRate(x, x0,xS, xF, q0, a))';
     
     %Forcing first elem. to zero because of BCs
@@ -38,7 +23,7 @@ for n = 1:N
     A(1,1) = 0;
     etaNew = dt*q + (-A+eye(M))*etaLast;
     
-    %eta skal ikke bli negativ:
+    %eta non-negative:
     etaNew(etaNew<=0) = 0;
     etaMat(:,n+1) = etaNew;
     
@@ -46,7 +31,6 @@ for n = 1:N
 
   
 end
-
 
 end
 
